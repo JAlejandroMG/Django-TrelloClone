@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from rest_framework.viewsets import ModelViewSet
 
-# Create your views here.
+from comments.models import Comment
+from comments.serializers import CommentSerializer, DetailCommentSerializer
+
+
+class CommentViewSet(ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return DetailCommentSerializer
+        return CommentSerializer
