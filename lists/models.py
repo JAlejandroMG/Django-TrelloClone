@@ -1,5 +1,7 @@
 from django.db import models
 
+from boards.models import Board
+
 
 class List(models.Model):
     name = models.CharField(max_length=250)
