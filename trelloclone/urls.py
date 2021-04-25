@@ -1,12 +1,7 @@
 from django.contrib import admin
-from django.urls import path
-from rest_framework.routers import DefaultRouter
-from boards.views import BoardViewSet
-
-router = DefaultRouter()
-router.register('Boards', BoardViewSet)
-
+from django.urls import path, include
 
 urlpatterns = [
-        path('admin/', admin.site.urls)
-              ] + router.urls
+    path('admin/', admin.site.urls),
+    path('boards/', include('boards.urls'))
+]
