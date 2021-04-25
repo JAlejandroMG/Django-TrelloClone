@@ -37,6 +37,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'boards.apps.BoardsConfig',
     'comments.apps.CommentsConfig',
     'cards.apps.CardsConfig',
     'users.apps.UsersConfig',
