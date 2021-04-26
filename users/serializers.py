@@ -8,7 +8,7 @@ class UsersSerializer(ModelSerializer):
         fields = ('id', 'first_name', 'last_name', 'email')
 
 
-class UsersDetailSerializer:
+class UsersDetailSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('id', 'first_name', 'last_name', 'email')
