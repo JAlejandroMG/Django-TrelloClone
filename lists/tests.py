@@ -17,6 +17,7 @@ class TestListCRUD(APITestCase):
             name='List 1',
             description='This board talk about cars',
             date_creation='2021-01-01'
+
         )
 
     def test_get_lists(self):
