@@ -1,0 +1,24 @@
+Requerimientos:
+
+1. Registro en plataforma - POST users (LISTO) / Desde Login FE
+
+2. Crear tablero - POST boards (LISTO) / Desde Home FE
+
+3. Lista de tableros - GET boards (LISTO) / Visualizar tableros Home FE
+   Seleccionar favoritos - PATCH users_boards (LISTO) / Visualizar tablerosfavoritos Home FE
+
+4. Invitar usuarios - SendEmail action (PENDIENTE) /
+
+5. Crear listas (LISTO) - POST boards
+   Crear tareas (LISTO) - POST cards
+
+6. Ordenar listas (LISTO) - PATCH lists(position)
+
+7. Crear tarjetas (LISTO) - POST cards
+   Asignar responsables (LISTO) - POST cards_users
+
+8. Notificaciones - SendEmail (PENDIENTE)
+
+9. Crear comentarios (LISTO) -POST comments
+
+10. Recordatorios TareaAsíncrona cards (PENDIENTE)
