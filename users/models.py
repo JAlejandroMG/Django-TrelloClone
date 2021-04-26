@@ -8,6 +8,9 @@ class User(models.Model):
     password = models.CharField(max_length=50)
     favorites = models.ManyToManyField(
         'boards.Board',
-        related_name='favorites',
+        related_name='users',
         blank=True
     )
+
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'

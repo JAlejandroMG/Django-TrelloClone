@@ -13,3 +13,6 @@ class Board(models.Model):
     ]
     visibility = models.CharField(max_length=7, choices=TYPE_CHOICES, default='OWNER')
     members = models.ManyToManyField('users.User', related_name='members_board', blank=True)
+
+    def __str__(self):
+        return f'{self.name} creada por {self.owner}'
