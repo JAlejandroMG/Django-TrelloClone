@@ -4,7 +4,7 @@ from django.db import models
 class Board(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
-    date_creation = models.DateTimeField()
+    date_creation = models.DateTimeField(3)
     owner = models.ForeignKey('users.User', related_name='creator_board', on_delete=models.SET_NULL, null=True)
     MEMBERS = 'MEMBERS'
     OWNER = 'OWNER'
