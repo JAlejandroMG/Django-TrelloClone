@@ -19,7 +19,7 @@ class Card(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-    creation_date = models.DateField()
+    creation_date = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateField()
     position = models.IntegerField
     members = models.ManyToManyField(
