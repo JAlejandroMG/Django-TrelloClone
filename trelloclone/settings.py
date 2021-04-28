@@ -26,6 +26,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'rest_framework',
+    'drf_yasg',
     'lists.apps.ListsConfig',
     'boards.apps.BoardsConfig',
     'comments.apps.CommentsConfig',
