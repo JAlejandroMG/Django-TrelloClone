@@ -1,8 +1,8 @@
 from django.db import models
+
 from lists.models import List
-from users.models import User
-from lists.models import List
-from users.models import User
+from users.models import CustomUser
+
 
 class Card(models.Model):
     name = models.CharField(max_length=200)
@@ -14,7 +14,7 @@ class Card(models.Model):
     )
     description = models.CharField(max_length=200)
     owner = models.ForeignKey(
-        User,
+        CustomUser,
         related_name='Card',
         on_delete=models.SET_NULL,
         null=True
@@ -23,7 +23,7 @@ class Card(models.Model):
     expiration_date = models.DateField()
     position = models.IntegerField
     members = models.ManyToManyField(
-        User,
+        CustomUser,
         related_name='Cards',
         blank=True
     )
