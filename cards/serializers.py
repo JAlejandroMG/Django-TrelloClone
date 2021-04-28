@@ -17,7 +17,6 @@ class AddCardSerializer(ModelSerializer):
             'description',
             'owner',
             'expiration_date',
-            'expiration_date',
             'position'
         )
 
@@ -31,7 +30,7 @@ class DetailCardSerializer(ModelSerializer):
             'list_id',
             'description',
             'owner',
-            'expiration_date',
+            'creation_date',
             'expiration_date',
             'position',
             'members'
