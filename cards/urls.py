@@ -5,4 +5,3 @@ router = DefaultRouter()
 router.register(r'', CardsViewSet)
 
 urlpatterns = router.urls
-
