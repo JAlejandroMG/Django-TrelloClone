@@ -21,7 +21,7 @@ class Card(models.Model):
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateField()
-    position = models.IntegerField
+    position = models.IntegerField()
     members = models.ManyToManyField(
         CustomUser,
         related_name='Cards',

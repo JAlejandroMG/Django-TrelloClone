@@ -6,3 +6,33 @@ class ShowCardsSerializer(ModelSerializer):
     class Meta:
         model = Card
         fields = ('id', 'name', 'description')
+
+
+class AddCardSerializer(ModelSerializer):
+    class Meta:
+        model = Card
+        fields = (
+            'name',
+            'list_id',
+            'description',
+            'owner',
+            'expiration_date',
+            'expiration_date',
+            'position'
+        )
+
+
+class DetailCardSerializer(ModelSerializer):
+    class Meta:
+        model = Card
+        fields = (
+            'id',
+            'name',
+            'list_id',
+            'description',
+            'owner',
+            'expiration_date',
+            'expiration_date',
+            'position',
+            'members'
+        )
