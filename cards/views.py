@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from cards.models import Card
 from cards.serializers import ShowCardsSerializer, DetailCardSerializer, AddCardSerializer
+from lists.models import List
+from users.serializers import UsersSerializer
 
 
 class CardsViewSet(ModelViewSet):
@@ -57,4 +59,23 @@ class CardsViewSet(ModelViewSet):
         else:
             return Response(
                 status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+
+    @action(methods=['GET', 'POST'], detail=True)
+    def members(self, request, pk=None):
+        card = self.get_object()
+        if request.method == 'GET':
+            members = card.members.all()
+            serialized = UsersSerializer(members, many=True)
+            return Response(
+                status=status.HTTP_200_OK,
+                data=serialized.data
+            )
+
+        if request.method == 'POST':
+            list_data = List.objects.get(id=pk)
+            board_data = list_data
+            print(board_data.id)
+            return Response(
+                status=status.HTTP_201_CREATED
             )
