@@ -17,7 +17,7 @@ class UsersViewSet(ModelViewSet):
         return UsersSerializer
 
 
-    @action(methods=['GET', 'POST', 'DELETE', 'PUT'], detail=True)
+    @action(methods=['GET', 'POST', 'DELETE'], detail=True)
     def favorites(self, request, pk=None):
         User = CustomUser
         user_detail = User.objects.get(id=pk)
@@ -37,3 +37,15 @@ class UsersViewSet(ModelViewSet):
             for favorite in favoritedetail:
                 user_detail.favorites.remove(favorite)
             return Response(status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=True)
+    def creator(self, request, pk=None):
+        User = CustomUser
+        user_detail = User.objects.get(id=pk)
+        if request.method == 'GET':
+            myCreator = user_detail.creator_board.all()
+            serialized=DetailBoardSerializer(myCreator,many=True)
+            return Response(
+                status=status.HTTP_200_OK,
+                data=serialized.data
+                )
