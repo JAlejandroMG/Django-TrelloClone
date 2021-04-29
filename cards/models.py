@@ -10,14 +10,12 @@ class Card(models.Model):
         List,
         related_name='Card',
         on_delete=models.SET_NULL,
-        null=True
     )
     description = models.CharField(max_length=200)
     owner = models.ForeignKey(
         CustomUser,
         related_name='Card',
         on_delete=models.SET_NULL,
-        null=True
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateField()
