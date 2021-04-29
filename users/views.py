@@ -3,7 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from boards.serializers import DetailBoardSerializer
 from users.models import CustomUser
-from users.serializers import UsersSerializer, UsersDetailSerializer
+from users.serializers import UsersSerializer, UsersDetailSerializer, CreateUserSerializer
 from rest_framework.decorators import action
 
 class UsersViewSet(ModelViewSet):
@@ -14,6 +14,8 @@ class UsersViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve' or self.action == 'partial_update':
             return UsersDetailSerializer
+        if self.request.method == 'POST':
+            return CreateUserSerializer
         return UsersSerializer
 
 
