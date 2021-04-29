@@ -12,4 +12,4 @@ class ListSerializer(ModelSerializer):
 class DetailListSerializer(ModelSerializer):
     class Meta:
         model = List
-        fields = ('id', 'name', 'creation_date', 'position')
+        fields = ('id', 'name', 'creation_date', 'position','board_id')
