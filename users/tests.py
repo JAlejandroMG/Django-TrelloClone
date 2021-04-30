@@ -3,7 +3,7 @@ from django.test import TestCase
 from users.models import CustomUser
 
 
-class UsersManagersTests(TestCase):
+class TestUsersManagers(TestCase):
 
     def test_create_user(self):
         user = CustomUser
@@ -27,3 +27,4 @@ class UsersManagersTests(TestCase):
         self.assertTrue(admin_user.is_active)
         self.assertTrue(admin_user.is_staff)
         self.assertTrue(admin_user.is_superuser)
+

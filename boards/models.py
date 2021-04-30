@@ -5,7 +5,7 @@ class Board(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
     date_creation = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey('users.CustomUser', related_name='creator_board', on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey('users.CustomUser', related_name='creator_board', on_delete=models.CASCADE)
     PRIVATE = 'PRIVATE'
     PUBLIC = 'PUBLIC'
     TYPE_CHOICES = [
