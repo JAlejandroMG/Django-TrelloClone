@@ -19,7 +19,8 @@ class ListViewSet(ModelViewSet):
     def position(self, request, pk=None):
         if request.method == 'PATCH':
             # selecciono la lista  a mover por el id
-            list = List.objects.get(id=pk)
+            print(pk)
+            list = self.get_object()
             # establecemos el board para las validaciones
             serialized = DetailListSerializer(list)
             board = (self.request.query_params['board'])
