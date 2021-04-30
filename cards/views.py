@@ -1,3 +1,4 @@
+from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -5,6 +6,7 @@ from rest_framework.viewsets import ModelViewSet
 from cards.models import Card
 from cards.serializers import ShowCardsSerializer, DetailCardSerializer, AddCardSerializer
 from lists.models import List
+from users.models import CustomUser
 from users.serializers import UsersSerializer
 
 
@@ -19,7 +21,7 @@ class CardsViewSet(ModelViewSet):
             return AddCardSerializer
         return ShowCardsSerializer
 
-    @action(methods=['GET', 'POST', 'DELETE', 'PUT', 'PATCH'], detail=True)
+    @action(methods=['PATCH'], detail=True)
     def position(self, request, pk=None):
         card = Card.objects.get(id=pk)
         card_all = Card.objects.filter(list_id=self.request.query_params['list']).order_by('-position')
@@ -73,9 +75,23 @@ class CardsViewSet(ModelViewSet):
             )
 
         if request.method == 'POST':
-            list_data = List.objects.get(id=pk)
-            board_data = list_data
-            print(board_data.id)
-            return Response(
-                status=status.HTTP_201_CREATED
-            )
+            list_data = card.list_id
+            board_data = list_data.board_id
+            members_board = board_data.members
+            if members_board.filter(id=request.data['newmember']):
+                member = CustomUser.objects.get(id=request.data['newmember'])
+                card.members.add(member)
+                send_mail(
+                    'Se te asigno una tarea',
+                    f'se te asigno la tarea {card.name} para el tablero {board_data.name}',
+                    'trelloclone@trello.com',
+                    [member.email],
+                    fail_silently=False
+                )
+                return Response(
+                    status=status.HTTP_201_CREATED
+                )
+            else:
+                return Response(
+                    status=status.HTTP_404_NOT_FOUND
+                )
