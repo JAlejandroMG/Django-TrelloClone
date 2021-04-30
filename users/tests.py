@@ -3,7 +3,7 @@ from django.test import TestCase
 from users.models import CustomUser
 
 
-class UsersManagersTests(TestCase):
+class TestUsersManagers(TestCase):
 
     def test_create_user(self):
         user = CustomUser

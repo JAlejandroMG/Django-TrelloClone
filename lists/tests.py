@@ -1,5 +1,7 @@
 from rest_framework.test import APITestCase
+
 from boards.models import Board
+
 from lists.models import List
 from users.models import CustomUser
 

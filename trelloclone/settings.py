@@ -168,7 +168,9 @@ REST_FRAMEWORK = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp.mailtrap.io'
-EMAIL_PORT = '2525'
-EMAIL_HOST_USER = 'ff879afdd4d2bd'
-EMAIL_HOST_PASSWORD = '65865b6dbd1216'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672/'

@@ -12,13 +12,13 @@ class UsersSerializer(ModelSerializer):
 class UsersDetailSerializer(ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'email', 'favorites')
+        fields = ('id', 'first_name', 'last_name', 'email', 'favorites')
 
 
 class CreateUserSerializer(ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id', 'first_name', 'last_name', 'email', 'password', 'favorites')
+        fields = ('id', 'first_name', 'last_name', 'email', 'password')
 
     def create(self, validated_data):
         user = CustomUser(

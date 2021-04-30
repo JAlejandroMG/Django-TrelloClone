@@ -1,3 +1,5 @@
+from datetime import timedelta, datetime
+
 from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.decorators import action
@@ -5,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from cards.models import Card
 from cards.serializers import ShowCardsSerializer, DetailCardSerializer, AddCardSerializer
+from cards.tasks import send_cards_duedate_notification
 from users.models import CustomUser
 from users.serializers import UsersSerializer
 
@@ -12,6 +15,21 @@ from users.serializers import UsersSerializer
 class CardsViewSet(ModelViewSet):
     queryset = Card.objects.all()
     serializer_class = ShowCardsSerializer
+
+    def create(self, request):
+        serialized = AddCardSerializer(data=request.data)
+        if not serialized.is_valid():
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data=serialized.errors
+            )
+        task = serialized.save()
+        user = CustomUser.objects.filter(id=task.owner.id)
+        self.send_duedate_notification(user[0].email, task.expiration_date)
+        return Response(
+            status=status.HTTP_201_CREATED,
+            data=serialized.data
+        )
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == 'retrieve':
@@ -94,3 +112,10 @@ class CardsViewSet(ModelViewSet):
                 return Response(
                     status=status.HTTP_404_NOT_FOUND
                 )
+
+    def send_duedate_notification(self, email, expiration_date) -> None:
+        date_to_send = expiration_date - timedelta(days=1)
+        send_cards_duedate_notification.apply_async(
+            args=[email],
+            eta=date_to_send
+        )
