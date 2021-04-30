@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from lists.models import List
-from lists.serializers import ListSerializer, DetailListSerializer
+from lists.serializers import ListSerializer, DetailListSerializer, AddListSerializer
 
 
 class ListViewSet(ModelViewSet):
@@ -13,6 +13,8 @@ class ListViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return DetailListSerializer
+        if self.action == 'create':
+            return AddListSerializer
         return ListSerializer
 
     @action(methods=['PATCH'], detail=True)
