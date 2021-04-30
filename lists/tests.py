@@ -50,13 +50,6 @@ class TestListCRUD(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 5)
 
-    def test_change_position_no_exist(self):
-        data = {
-            'position': 3
-        }
-        response = self.client.patch(f'{self.host}/lists/{str(self.list[3].id)}/position/?board=2', data)
-        self.assertEqual(response.status_code, 406)
-
     def test_change_position(self):
         data2 = {
             'position': 4
@@ -64,3 +57,10 @@ class TestListCRUD(APITestCase):
         response = self.client.patch(f'{self.host}/lists/{str(self.list[2].id)}/position/?board=1', data2)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(List.objects.get(id=self.list[2].id).position, data2['position'])
+
+    def test_change_position_no_exist(self):
+        data = {
+            'position': 3
+        }
+        response = self.client.patch(f'{self.host}/lists/{str(self.list[3].id)}/position/?board=2', data)
+        self.assertEqual(response.status_code, 406)
