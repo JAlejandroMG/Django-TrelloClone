@@ -42,16 +42,16 @@ class CardsViewSet(ModelViewSet):
     def position(self, request, pk=None):
         card = Card.objects.get(id=pk)
         card_all = Card.objects.filter(list_id=self.request.query_params['list']).order_by('-position')
-        list = (self.request.query_params['list'])
+        list__ = (self.request.query_params['list'])
         serialized = DetailCardSerializer(card)
         posicioncardamover = card.position
         request_position = int(request.data['position'])
-        actual = Card.objects.get(position=request_position, list_id=list)
-        if int(list) == int(serialized.data['list_id']):
+        actual = Card.objects.get(position=request_position, list_id=list__)
+        if int(list__) == int(serialized.data['list_id']):
             if posicioncardamover > request_position:
                 for cards in card_all:
                     if posicioncardamover > cards.position > request_position:
-                        new_position = Card.objects.get(position=cards.position, list_id=list)
+                        new_position = Card.objects.get(position=cards.position, list_id=list__)
                         position = cards.position + 1
                         new_position.position = position
                         new_position.save()
@@ -60,11 +60,11 @@ class CardsViewSet(ModelViewSet):
                 card.position = request_position
                 card.save()
             if posicioncardamover < request_position:
-                actual_position = Card.objects.get(position=request_position, list_id=list)
+                actual_position = Card.objects.get(position=request_position, list_id=list__)
                 card_all = Card.objects.filter(list_id=self.request.query_params['list']).order_by('position')
                 for cards2 in card_all:
                     if request_position >= cards2.position > posicioncardamover:
-                        new_position = Card.objects.get(position=cards2.position, list_id=list)
+                        new_position = Card.objects.get(position=cards2.position, list_id=list__)
                         position = cards2.position - 1
                         new_position.position = position
                         new_position.save()

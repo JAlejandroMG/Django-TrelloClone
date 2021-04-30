@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from lists.models import List
-from lists.serializers import ListSerializer, DetailListSerializer
+from lists.serializers import ListSerializer, DetailListSerializer, AddListSerializer
 
 
 class ListViewSet(ModelViewSet):
@@ -13,26 +13,29 @@ class ListViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return DetailListSerializer
+        if self.action == 'create':
+            return AddListSerializer
         return ListSerializer
 
     @action(methods=['PATCH'], detail=True)
     def position(self, request, pk=None):
         if request.method == 'PATCH':
             # selecciono la lista  a mover por el id
-            list = List.objects.get(id=pk)
-            # seleccionamos las listas pertenecientes a un board
-            list_all = List.objects.filter(board_id=self.request.query_params['board']).order_by('-position')
+            print(pk)
+            list = self.get_object()
             # establecemos el board para las validaciones
-            board = (self.request.query_params['board'])
             serialized = DetailListSerializer(list)
-            # encontramos la posicion de la lista a mover
-            posicionlistaamover = list.position
-            # valor de posicion a donde queremos mover la lista, que es enviado en el request
-            request_position = int(request.data['position'])
-            # valor de posicion de la lista a donde vamos a mover
-            actual = List.objects.get(position=request_position, board_id=board)
-            # verificacion de que la lista seleccionada por id pertenezca al tablero
+            board = (self.request.query_params['board'])
             if int(board) == int(serialized.data['board_id']):
+                # seleccionamos las listas pertenecientes a un board
+                list_all = List.objects.filter(board_id=self.request.query_params['board']).order_by('-position')
+                # encontramos la posicion de la lista a mover
+                posicionlistaamover = list.position
+                # valor de posicion a donde queremos mover la lista, que es enviado en el request
+                request_position = int(request.data['position'])
+                # valor de posicion de la lista a donde vamos a mover
+                actual = List.objects.get(position=request_position, board_id=board)
+                # verificacion de que la lista seleccionada por id pertenezca al tablero
                 # algoritmo para cuando se mueve la lista de una posicion mayor a menor
                 if posicionlistaamover > request_position:
                     for lists in list_all:
@@ -59,10 +62,10 @@ class ListViewSet(ModelViewSet):
                     list.save()
                     actual_position.position = actual_position.position - 1
                     actual_position.save()
+                    serialized=DetailListSerializer(list)
                 return Response(
-                    status=status.HTTP_200_OK
+                    status=status.HTTP_200_OK,
+                    data=serialized.data
                 )
             else:
-                return Response(
-                    status=status.HTTP_406_NOT_ACCEPTABLE
-                )
+                return Response(status=status.HTTP_406_NOT_ACCEPTABLE)

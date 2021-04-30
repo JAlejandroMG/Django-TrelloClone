@@ -1,74 +1,68 @@
 from rest_framework.test import APITestCase
 
-"""from boards.models import Board
+from boards.models import Board
+
 from lists.models import List
+from users.models import CustomUser
 
 
 class TestListCRUD(APITestCase):
 
     def setUp(self):
+        User = CustomUser
         self.host = 'http://127.0.0.1:8000'
-        self.list = List.objects.create(
-            name='List 1',
-            creation_date='2021-01-01',
-            position='1'
+        self.user = User.objects.create(
+            email='jaime@gmail.com',
+            first_name='juan',
+            last_name='felipe',
         )
         self.board = Board.objects.create(
+            id=1,
             name='List 1',
             description='This board talk about cars',
-            date_creation='2021-01-01'
-
+            date_creation='2021-01-01',
+            owner=self.user,
+            visibility='PRIVATE'
         )
+        self.board = Board.objects.create(
+            id=2,
+            name='List 2',
+            description='This board talk about cars',
+            date_creation='2021-01-01',
+            owner=self.user,
+            visibility='PRIVATE'
+        )
+        self.list = []
+        for i in range(5):
+            self.list.append(List.objects.create(
+                name=f'List {i + 1}',
+                board_id_id=1,
+                creation_date='2021-01-01',
+                position=f'{i + 1}'
+            )
+            )
+
+    def test_get_Users(self):
+        response = self.client.get(f'{self.host}/users/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
 
     def test_get_lists(self):
         response = self.client.get(f'{self.host}/lists/')
-
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(self.list.id, response.data[0]['id'], response.data)
+        self.assertEqual(len(response.data), 5)
 
-    def test_get_lists_id(self):
-        response = self.client.get(f'{self.host}/lists/{self.list.id}/')
+    def test_change_position(self):
+        data2 = {
+            'position': 4
+        }
+        response = self.client.patch(f'{self.host}/lists/{str(self.list[2].id)}/position/?board=1', data2)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual((response.data['name']), 'List 1')
+        self.assertEqual(List.objects.get(id=self.list[2].id).position, data2['position'])
 
-    def test_post_lists(self):
+    def test_change_position_no_exist(self):
         data = {
-            'name': 'List 1',
-            'creation_date': '2021-01-01',
-            'position': '1'
+            'position': 3
         }
-
-        response = self.client.post(f'{self.host}/lists/', data)
-
-        self.assertEqual(response.status_code, 201, response.data)
-        self.assertEqual(List.objects.all().count(), 2)
-
-    def test_delete_lists(self):
-        response = self.client.delete(f'{self.host}/lists/{self.list.id}/')
-        list = List.objects.all()
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(len(list), 0)
-
-    def test_patch_lists(self):
-        data = {
-            'name': 'List 2'
-        }
-        response = self.client.patch(f'{self.host}/lists/{self.list.id}/', data)
-        list = List.objects.all()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual((response.data['name']), 'List 2')
-
-    def test_put_lists(self):
-        data = {
-            'name': 'List 1',
-            'creation_date': '2021-01-01',
-            'position': '1',
-            'board': self.board.id
-        }
-        response = self.client.put(f'{self.host}/lists/{self.list.id}/', data)
-        self.assertEqual(response.status_code, 200, response.data)
-        self.assertEqual((response.data['name']), 'List 2')
-        self.assertEqual((response.data['creation_date']), '2021-02-01')
-        self.assertEqual((response.data['position']), '1')
-        self.assertEqual((response.data['board']), self.board.id)"""
+        response = self.client.patch(f'{self.host}/lists/{str(self.list[3].id)}/position/?board=2', data)
+        self.assertEqual(response.status_code, 406)
