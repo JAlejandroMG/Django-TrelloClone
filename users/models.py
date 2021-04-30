@@ -24,14 +24,3 @@ class CustomUser(AbstractUser):
 
 
 """python manage.py makemigrations --dry-run --verbosity 3"""
-
-""""id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-"password" varchar(128) NOT NULL,
-"last_login" datetime NULL,
-"is_superuser" bool NOT NULL,
-"first_name" varchar(30) NOT NULL,
-"last_name" varchar(150) NOT NULL,
-"is_staff" bool NOT NULL,
-"is_active" bool NOT NULL,
-"date_joined" datetime NOT NULL,
-"email" varchar(254) NOT NULL UNIQUE"""

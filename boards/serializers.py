@@ -5,10 +5,10 @@ from boards.models import Board
 class BoardSerializer(ModelSerializer):
     class Meta:
         model = Board
-        fields = '__all__'
+        fields = ('id', 'name', 'description', 'owner')
 
 
 class DetailBoardSerializer(ModelSerializer):
     class Meta:
         model = Board
-        fields = ('id', 'name', 'owner', 'visibility', 'members')
+        fields = ('id', 'name', 'description', 'owner', 'visibility', 'members')

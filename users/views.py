@@ -6,6 +6,7 @@ from users.models import CustomUser
 from users.serializers import UsersSerializer, UsersDetailSerializer, CreateUserSerializer
 from rest_framework.decorators import action
 
+
 class UsersViewSet(ModelViewSet):
     User = CustomUser
     queryset = User.objects.all()
@@ -17,7 +18,6 @@ class UsersViewSet(ModelViewSet):
         if self.request.method == 'POST':
             return CreateUserSerializer
         return UsersSerializer
-
 
     @action(methods=['GET', 'POST', 'DELETE'], detail=True)
     def favorites(self, request, pk=None):

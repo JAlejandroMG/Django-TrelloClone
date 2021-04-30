@@ -5,16 +5,17 @@ from cards.models import Card
 class ShowCardsSerializer(ModelSerializer):
     class Meta:
         model = Card
-        fields = ('id', 'name', 'description')
+        fields = ('id', 'name', 'description', 'expiration_date')
 
 
 class AddCardSerializer(ModelSerializer):
     class Meta:
         model = Card
         fields = (
+            'id',
             'name',
-            'list_id',
             'description',
+            'list_id',
             'owner',
             'expiration_date',
             'position'
@@ -27,10 +28,9 @@ class DetailCardSerializer(ModelSerializer):
         fields = (
             'id',
             'name',
-            'list_id',
             'description',
+            'list_id',
             'owner',
-            'creation_date',
             'expiration_date',
             'position',
             'members'
