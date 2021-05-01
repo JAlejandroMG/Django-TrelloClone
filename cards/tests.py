@@ -82,5 +82,3 @@ class TestCardsViewSet(APITestCase):
             position=len(Card.objects.filter(id=self.list3.id))+1
         )
 
-    def test_send_cards_duedate_notification(self) -> None:
-        pass

@@ -41,14 +41,27 @@ class TestListCRUD(APITestCase):
                 position=f'{i + 1}'
             )
             )
+        self.token = 'token'
+        self.user = User.objects.create_user(
+            first_name='user',
+            last_name='user',
+            email='user@email.com',
+            password='test'
+        )
+        response = self.client.post(f'{self.host}/api/token/', {
+            'email': 'user@email.com',
+            'password': 'test'
+        })
+        self.auth = f'Bearer {response.data["access"]}'
 
     def test_get_Users(self):
-        response = self.client.get(f'{self.host}/users/')
+        response = self.client.get(f'{self.host}/users/', HTTP_AUTHORIZATION=self.auth)
+        print(response.data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
     def test_get_lists(self):
-        response = self.client.get(f'{self.host}/lists/')
+        response = self.client.get(f'{self.host}/lists/', HTTP_AUTHORIZATION=self.auth)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 5)
 
