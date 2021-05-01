@@ -17,24 +17,27 @@ class BoardViewSet(ModelViewSet):
             return DetailBoardSerializer
         return BoardSerializer
 
-    @action(methods=['POST','GET'], detail=True)
+    @action(methods=['POST', 'GET'], detail=True)
     def members(self, request, pk=None):
         board = self.get_object()
         if request.method == 'POST':
             members_id = request.data['members']
-            owner = CustomUser.objects.get(email=board.owner)
+            owner = CustomUser.objects.get(id=board.owner.id)
             for member_id in members_id:
-                member = CustomUser.objects.get(id=member_id)
-                board.members.add(member)
-                send_mail(
-                    'Nuevo miembro tablero Trello',
-                    f'{owner.first_name} {owner.last_name} te incluido al tablero {board.name}',
-                    'trelloclone@trello.com',
-                    [member.email],
-                    fail_silently=False
-                )
+                filter_data = board.members.filter(id=member_id)
+                if filter_data:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    member = CustomUser.objects.get(id=member_id)
+                    board.members.add(member)
+                    send_mail(
+                        'Nuevo miembro tablero Trello',
+                        f'{owner.first_name} {owner.last_name} te incluido al tablero {board.name}',
+                        'trelloclone@trello.com',
+                        [member.email],
+                        fail_silently=False
+                    )
             return Response(status=status.HTTP_201_CREATED)
-
         board_detail = Board.objects.get(id=pk)
         if request.method == 'GET':
             members = board_detail.members.all()
