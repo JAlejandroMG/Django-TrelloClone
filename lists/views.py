@@ -23,7 +23,7 @@ class ListViewSet(ModelViewSet):
     def new_position(self, request, pk=None):
         if request.method == 'PATCH':
             board_id = self.get_object().board_id.id
-            list_new_position = request.data['new_position']
+            list_new_position = request.data['position']
             if list_new_position > List.objects.filter(board_id=board_id).count():
                 return Response(
                     status=status.HTTP_400_BAD_REQUEST,

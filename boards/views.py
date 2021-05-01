@@ -49,7 +49,6 @@ class BoardViewSet(ModelViewSet):
                 data=serialized.data
             )
 
-
     @action(methods=['GET'], detail=True)
     def lists(self, request, pk=None):
         if request.method == 'GET':
