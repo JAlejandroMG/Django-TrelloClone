@@ -1,4 +1,5 @@
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from boards.serializers import DetailBoardSerializer
@@ -18,6 +19,11 @@ class UsersViewSet(ModelViewSet):
         if self.request.method == 'POST':
             return CreateUserSerializer
         return UsersSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            self.permission_classes = (AllowAny,)
+        return super(UsersViewSet, self).get_permissions()
 
     @action(methods=['GET', 'POST', 'DELETE'], detail=True)
     def favorites(self, request, pk=None):

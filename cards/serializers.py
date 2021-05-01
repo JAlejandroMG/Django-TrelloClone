@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from cards.models import Card
+from lists.models import List
 
 
 class ShowCardsSerializer(ModelSerializer):
@@ -21,17 +22,14 @@ class AddCardSerializer(ModelSerializer):
         )
 
     def create(self, validated_data):
-        data_list = validated_data['list_id']
-        cards_in_list = data_list.Card
-        cards_in_list_serialized = ShowCardsSerializer(cards_in_list, many=True)
-        default_position_card = len(cards_in_list_serialized.data)+1
+        new_position = Card.objects.filter(list_id=validated_data['list_id'].id).count()+1
         card = Card(
             name=validated_data['name'],
             list_id=validated_data['list_id'],
             description=validated_data['description'],
             owner=validated_data['owner'],
             expiration_date=validated_data['expiration_date'],
-            position=default_position_card
+            position=new_position
         )
         card.save()
         return card

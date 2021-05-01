@@ -81,4 +81,3 @@ class TestCardsViewSet(APITestCase):
             expiration_date="2021-05-2",
             position=len(Card.objects.filter(id=self.list3.id))+1
         )
-

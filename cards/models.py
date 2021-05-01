@@ -15,6 +15,7 @@ class Card(models.Model):
     owner = models.ForeignKey(
         CustomUser,
         related_name='Card',
+        default=0,
         on_delete=models.CASCADE
     )
     creation_date = models.DateTimeField(auto_now_add=True)

@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 
+from boards.models import Board
 from lists.models import List
 
 
@@ -12,7 +13,7 @@ class ListSerializer(ModelSerializer):
 class DetailListSerializer(ModelSerializer):
     class Meta:
         model = List
-        fields = ('id', 'name', 'creation_date', 'position','board_id')
+        fields = ('id', 'name', 'creation_date', 'position', 'board_id')
 
 
 class AddListSerializer(ModelSerializer):
@@ -21,14 +22,11 @@ class AddListSerializer(ModelSerializer):
         fields = ('name', 'board_id')
 
     def create(self, validated_data):
-        data_board = validated_data['board_id']
-        lists_in_board = data_board.lists
-        lists_in_board_serialized = ListSerializer(lists_in_board, many=True)
-        default_position_list = len(lists_in_board_serialized.data)+1
+        new_position = List.objects.filter(board_id=validated_data['board_id'].id).count()+1
         list__ = List(
             name=validated_data['name'],
             board_id=validated_data['board_id'],
-            position=default_position_list
+            position=new_position
         )
         list__.save()
         return list__

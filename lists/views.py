@@ -18,54 +18,45 @@ class ListViewSet(ModelViewSet):
         return ListSerializer
 
     @action(methods=['PATCH'], detail=True)
-    def position(self, request, pk=None):
+    def new_position(self, request, pk=None):
         if request.method == 'PATCH':
-            # selecciono la lista  a mover por el id
-            print(pk)
-            list = self.get_object()
-            # establecemos el board para las validaciones
-            serialized = DetailListSerializer(list)
-            board = (self.request.query_params['board'])
-            if int(board) == int(serialized.data['board_id']):
-                # seleccionamos las listas pertenecientes a un board
-                list_all = List.objects.filter(board_id=self.request.query_params['board']).order_by('-position')
-                # encontramos la posicion de la lista a mover
-                posicionlistaamover = list.position
-                # valor de posicion a donde queremos mover la lista, que es enviado en el request
-                request_position = int(request.data['position'])
-                # valor de posicion de la lista a donde vamos a mover
-                actual = List.objects.get(position=request_position, board_id=board)
-                # verificacion de que la lista seleccionada por id pertenezca al tablero
-                # algoritmo para cuando se mueve la lista de una posicion mayor a menor
-                if posicionlistaamover > request_position:
-                    for lists in list_all:
-                        if posicionlistaamover > lists.position > request_position:
-                            new_position = List.objects.get(position=lists.position, board_id=board)
-                            position = lists.position + 1
-                            new_position.position = position
-                            new_position.save()
-                    actual.position = actual.position + 1
-                    actual.save()
-                    list.position = request_position
-                    list.save()
-                    # algoritmo para cuando se mueve la lista de una posicion menor a una mayor
-                if posicionlistaamover < request_position:
-                    actual_position = List.objects.get(position=request_position, board_id=board)
-                    list_all = List.objects.filter(board_id=self.request.query_params['board']).order_by('position')
-                    for lists2 in list_all:
-                        if request_position >= lists2.position > posicionlistaamover:
-                            new_position = List.objects.get(position=lists2.position, board_id=board)
-                            position = lists2.position - 1
-                            new_position.position = position
-                            new_position.save()
-                    list.position = request_position
-                    list.save()
-                    actual_position.position = actual_position.position - 1
-                    actual_position.save()
-                    serialized=DetailListSerializer(list)
+            board_id = self.get_object().board_id.id
+            list_new_position = request.data['new_position']
+            if list_new_position > List.objects.filter(board_id=board_id).count():
                 return Response(
-                    status=status.HTTP_200_OK,
-                    data=serialized.data
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data="No hay tal cantidad de listas en el tablero actual"
                 )
+            list_actual_position = self.get_object().position
+            if list_new_position > list_actual_position:
+                result = self.assign_new_positions(board_id, list_actual_position, list_new_position, '', -1)
+            if list_new_position < list_actual_position:
+                result = self.assign_new_positions(board_id, list_new_position, list_actual_position, '-', 1)
+        if result:
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def assign_new_positions(self, board_id, position1, position2, order_by, change):
+        try:
+            if change < 0:  # list_new_position > list_actual_position
+                list_to_change = List.objects.get(board_id=board_id, position=position1)
+                lists_to_modify = List.objects.filter(board_id=board_id, position__gt=position1,
+                                                      position__lte=position2).order_by(f'{order_by}position')
+            else:    # list_new_position < list_actual_position
+                list_to_change = List.objects.get(board_id=board_id, position=position2)
+                lists_to_modify = List.objects.filter(board_id=board_id, position__gte=position1,
+                                                      position__lt=position2).order_by(f'{order_by}position')
+            list_to_change.position = -1
+            list_to_change.save
+            for list in lists_to_modify:
+                list.position = list.position + change
+                list.save()
+            if change < 0:
+                list_to_change.position = position2
             else:
-                return Response(status=status.HTTP_406_NOT_ACCEPTABLE)
+                list_to_change.position = position1
+            list_to_change.save()
+            return True
+        except LookupError:
+            return Response(status=status.HTTP_404_NOT_FOUND)

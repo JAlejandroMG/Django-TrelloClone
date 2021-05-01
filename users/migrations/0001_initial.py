@@ -10,8 +10,8 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('boards', '0001_initial'),
         ('auth', '0011_update_proxy_permissions'),
+        ('boards', '0001_initial'),
     ]
 
     operations = [
