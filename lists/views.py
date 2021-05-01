@@ -2,6 +2,8 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
+
+from cards.serializers import DetailCardSerializer
 from lists.models import List
 from lists.serializers import ListSerializer, DetailListSerializer, AddListSerializer
 
@@ -60,3 +62,14 @@ class ListViewSet(ModelViewSet):
             return True
         except LookupError:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @action(methods=['GET'], detail=True)
+    def cards(self, request, pk=None):
+        if request.method == 'GET':
+            lists_detail = List.objects.get(id=pk)
+            cards = lists_detail.Card.all()
+            serialized = DetailCardSerializer(cards, many=True)
+            return Response(
+                status=status.HTTP_200_OK,
+                data=serialized.data
+            )

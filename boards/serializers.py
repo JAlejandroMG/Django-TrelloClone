@@ -11,4 +11,4 @@ class BoardSerializer(ModelSerializer):
 class DetailBoardSerializer(ModelSerializer):
     class Meta:
         model = Board
-        fields = ('id', 'name', 'description', 'owner', 'visibility', 'members')
+        fields = ('id', 'name', 'description', 'owner', 'visibility', 'members','lists')

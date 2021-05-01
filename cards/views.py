@@ -4,10 +4,10 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-
 from cards.models import Card
 from cards.serializers import ShowCardsSerializer, DetailCardSerializer, AddCardSerializer
 from cards.tasks import send_cards_duedate_notification
+from comments.serializers import DetailCommentSerializer
 from users.models import CustomUser
 from users.serializers import UsersSerializer
 
@@ -39,7 +39,7 @@ class CardsViewSet(ModelViewSet):
         return ShowCardsSerializer
 
     @action(methods=['PATCH'], detail=True)
-    def new_position(self, request, pk=None):
+    def position(self, request, pk=None):
         if request.method == 'PATCH':
             list_id = self.get_object().list_id.id
             card_new_position = request.data['new_position']
@@ -122,3 +122,14 @@ class CardsViewSet(ModelViewSet):
             args=[email],
             eta=date_to_send
         )
+
+    @action(methods=['GET'], detail=True)
+    def comments(self, request, pk=None):
+        if request.method == 'GET':
+            Card_detail = Card.objects.get(id=pk)
+            comments = Card_detail.comments.all()
+            serialized = DetailCommentSerializer(comments, many=True)
+            return Response(
+                status=status.HTTP_200_OK,
+                data=serialized.data
+            )
