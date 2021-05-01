@@ -5,7 +5,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from boards.models import Board
 from boards.serializers import BoardSerializer, DetailBoardSerializer
+from lists.serializers import DetailListSerializer
 from users.models import CustomUser
+from users.serializers import UsersDetailSerializer
 
 
 class BoardViewSet(ModelViewSet):
@@ -38,7 +40,19 @@ class BoardViewSet(ModelViewSet):
         board_detail = Board.objects.get(id=pk)
         if request.method == 'GET':
             members = board_detail.members.all()
-            serialized = DetailBoardSerializer(members)
+            serialized = UsersDetailSerializer(members, many=True)
+            return Response(
+                status=status.HTTP_200_OK,
+                data=serialized.data
+            )
+
+
+    @action(methods=['GET'], detail=True)
+    def lists(self, request, pk=None):
+        if request.method == 'GET':
+            board_detail = Board.objects.get(id=pk)
+            lists = board_detail.lists.all()
+            serialized = DetailListSerializer(lists, many=True)
             return Response(
                 status=status.HTTP_200_OK,
                 data=serialized.data
