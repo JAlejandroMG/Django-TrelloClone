@@ -81,6 +81,3 @@ class TestCardsViewSet(APITestCase):
             expiration_date="2021-05-2",
             position=len(Card.objects.filter(id=self.list3.id))+1
         )
-
-    def test_send_cards_duedate_notification(self) -> None:
-        pass

@@ -1,10 +1,10 @@
 from datetime import timedelta, datetime
-
 from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+
 from cards.models import Card
 from cards.serializers import ShowCardsSerializer, DetailCardSerializer, AddCardSerializer
 from cards.tasks import send_cards_duedate_notification
@@ -39,46 +39,48 @@ class CardsViewSet(ModelViewSet):
         return ShowCardsSerializer
 
     @action(methods=['PATCH'], detail=True)
-    def position(self, request, pk=None):
-        card = Card.objects.get(id=pk)
-        card_all = Card.objects.filter(list_id=self.request.query_params['list']).order_by('-position')
-        list__ = (self.request.query_params['list'])
-        serialized = DetailCardSerializer(card)
-        posicioncardamover = card.position
-        request_position = int(request.data['position'])
-        actual = Card.objects.get(position=request_position, list_id=list__)
-        if int(list__) == int(serialized.data['list_id']):
-            if posicioncardamover > request_position:
-                for cards in card_all:
-                    if posicioncardamover > cards.position > request_position:
-                        new_position = Card.objects.get(position=cards.position, list_id=list__)
-                        position = cards.position + 1
-                        new_position.position = position
-                        new_position.save()
-                actual.position = actual.position + 1
-                actual.save()
-                card.position = request_position
-                card.save()
-            if posicioncardamover < request_position:
-                actual_position = Card.objects.get(position=request_position, list_id=list__)
-                card_all = Card.objects.filter(list_id=self.request.query_params['list']).order_by('position')
-                for cards2 in card_all:
-                    if request_position >= cards2.position > posicioncardamover:
-                        new_position = Card.objects.get(position=cards2.position, list_id=list__)
-                        position = cards2.position - 1
-                        new_position.position = position
-                        new_position.save()
-                card.position = request_position
-                card.save()
-                actual_position.position = actual_position.position - 1
-                actual_position.save()
-            return Response(
-                status=status.HTTP_200_OK
-            )
+    def new_position(self, request, pk=None):
+        if request.method == 'PATCH':
+            list_id = self.get_object().list_id.id
+            card_new_position = request.data['new_position']
+            if card_new_position > Card.objects.filter(list_id=list_id).count():
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data="No hay tal cantidad de tarjetas en la lista actual"
+                )
+            card_actual_position = self.get_object().position
+            if card_new_position > card_actual_position:
+                result = self.assign_new_positions(list_id, card_actual_position, card_new_position, '', -1)
+            if card_new_position < card_actual_position:
+                result = self.assign_new_positions(list_id, card_new_position, card_actual_position, '-', 1)
+        if result:
+            return Response(status=status.HTTP_200_OK)
         else:
-            return Response(
-                status=status.HTTP_406_NOT_ACCEPTABLE
-            )
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def assign_new_positions(self, list_id, position1, position2, order_by, change):
+        try:
+            if change < 0:  # card_new_position > card_actual_position
+                card_to_change = Card.objects.get(list_id=list_id, position=position1)
+                cards_to_modify = Card.objects.filter(list_id=list_id, position__gt=position1,
+                                                      position__lte=position2).order_by(f'{order_by}position')
+            else:  # card_new_position < card_actual_position
+                card_to_change = Card.objects.get(list_id=list_id, position=position2)
+                cards_to_modify = Card.objects.filter(list_id=list_id, position__gte=position1,
+                                                      position__lt=position2).order_by(f'{order_by}position')
+            card_to_change.position = -1
+            card_to_change.save
+            for card in cards_to_modify:
+                card.position = card.position + change
+                card.save()
+            if change < 0:
+                card_to_change.position = position2
+            else:
+                card_to_change.position = position1
+            card_to_change.save()
+            return True
+        except LookupError:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
     @action(methods=['GET', 'POST'], detail=True)
     def members(self, request, pk=None):
@@ -114,7 +116,8 @@ class CardsViewSet(ModelViewSet):
                 )
 
     def send_duedate_notification(self, email, expiration_date) -> None:
-        date_to_send = expiration_date - timedelta(days=1)
+        date_to_send = expiration_date - timedelta(hours=11)
+        print(date_to_send)
         send_cards_duedate_notification.apply_async(
             args=[email],
             eta=date_to_send
