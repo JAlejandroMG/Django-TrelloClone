@@ -1,5 +1,4 @@
 from rest_framework.test import APITestCase
-
 from boards.models import Board
 from cards.models import Card
 from lists.models import List
@@ -7,77 +6,76 @@ from users.models import CustomUser
 
 
 class TestCardsViewSet(APITestCase):
-
-    def setUp(self) -> None:
+    def setUp(self):
+        user__ = CustomUser
         self.host = 'http://127.0.0.1:8000'
-        self.user = CustomUser.objects.create(
-            first_name='Chuchito',
-            last_name='Pérez',
-            email='cperez@gmail.com',
-            password='test2021'
+        self.user = user__.objects.create(
+            email='jaime@gmail.com',
+            first_name='juan',
+            last_name='felipe',
+            password='12345'
         )
-        self.board1 = Board.objects.create(
-            name="Fiesta",
-            description="Preparar los festejos patronales",
-            owner=self.user.id
+        self.user02 = user__.objects.create(
+            email='donovan@gamil.com',
+            first_name='Donovan',
+            last_name='Valencia',
+            password='12345'
         )
-        self.list1 = List.objects.create(
-            name="En espera",
-            board_id=self.board1.id,
-            position=len(List.objects.filter(id=self.board1.id))+1
+        self.board = Board.objects.create(
+            id=1,
+            name='test board',
+            description='solo un test de board',
+            date_creation='2021-01-01',
+            owner=self.user,
+            visibility='PRIVATE',
         )
-        self.card1 = Card.objects.create(
-            name="Lugar",
-            description="Encontrar donde hacer la fiesta",
-            list_id=self.list1.id,
-            owner=self.user.id,
-            expiration_date="2021-04-30",
-            position=len(Card.objects.filter(id=self.list1.id))+1
+        self.list = List.objects.create(
+            id=1,
+            name='test board',
+            board_id_id=1,
+            creation_date='2021-01-01',
+            position=1
         )
-        self.card2 = Card.objects.create(
-            name="Música",
-            description="Banda de música",
-            list_id=self.list1.id,
-            owner=self.user.id,
-            expiration_date="2021-05-2",
-            position=len(Card.objects.filter(id=self.list1.id))+1
+        self.cards__ = []
+        for i in range(7):
+            self.cards__.append(Card.objects.create(
+                name=f'Card {i+1}',
+                list_id_id=1,
+                description=f'descripcion {i+1}',
+                owner=self.user,
+                creation_date='2021-01-01',
+                expiration_date='2021-01-22',
+                position=f'{i + 1}',
+            ))
+        self.members_boards = {
+            'members': [str(self.user02.id)]
+        }
+        self.client.post(
+            f'{self.host}/boards/{str(self.board.id)}/members/',
+            self.members_boards,
+            content_type="application/json"
         )
-        self.list2 = List.objects.create(
-            name="En proceso",
-            board_id=self.board1.id,
-            position=len(List.objects.filter(id=self.board1.id))+1
-        )
-        self.card3 = Card.objects.create(
-            name="Promoción",
-            description="Dar a conocer el evento",
-            list_id=self.list2.id,
-            owner=self.user.id,
-            expiration_date="2021-04-30",
-            position=len(Card.objects.filter(id=self.list2.id))+1
-        )
-        self.board2 = Board.objects.create(
-            name="Convención",
-            description="Arreglar preparativos de convención",
-            owner=self.user.id
-        )
-        self.list3 = List.objects.create(
-            name="En proceso",
-            board_id=self.board2.id,
-            position=len(List.objects.filter(id=self.board2.id))+1
-        )
-        self.card4 = Card.objects.create(
-            name="Hospedaje",
-            description="Consiguiendo precios en hoteles",
-            list_id=self.list3.id,
-            owner=self.user.id,
-            expiration_date="2021-04-30",
-            position=len(Card.objects.filter(id=self.list3.id))+1
-        )
-        self.card2 = Card.objects.create(
-            name="Transporte",
-            description="Cotizando con empresas de autobuses",
-            list_id=self.list3.id,
-            owner=self.user.id,
-            expiration_date="2021-05-2",
-            position=len(Card.objects.filter(id=self.list3.id))+1
-        )
+
+    def test_get_cards(self):
+        response = self.client.get(f'{self.host}/cards/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 7)
+
+    # def test_add_members_board(self):
+    #     data_member_board = {
+    #         'members': [
+    #             self.user02.id,
+    #             self.user.id
+    #         ]
+    #     }
+    #
+    #     response = self.client.post(f'{self.host}/boards/{str(self.board.id)}/members/', data_member_board)
+    #     self.assertEqual(response.status_code, 201)
+    # def test_add_members_card(self):
+    #     data__ = {
+    #         'newmember': self.user02.id
+    #     }
+    #     print(self.user02.id)
+    #     print(self.cards__[1].id)
+    #     response = self.client.post(f'{self.host}/cards/{str(self.cards__[1].id)}/member/', data__)
+    #     self.assertEqual(response.status_code, 201)
