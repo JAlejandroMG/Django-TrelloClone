@@ -74,7 +74,7 @@ class TestUsersManagers(TestCase):
         response = self.client.get(f'{self.host}/users/{str(self.user.id)}/favorites/')
         self.assertEqual(response.status_code, 200)
 
-    def test_create_a_favorite_boards_of_a_user(self):
+    def test_delete_a_favorite_boards_of_a_user(self):
         data = {'favorite': [self.board1.id]}
         response = self.client.delete(f'{self.host}/users/{str(self.user.id)}/favorites/', data, content_type="application/json")
         self.assertEqual(response.status_code, 204)
