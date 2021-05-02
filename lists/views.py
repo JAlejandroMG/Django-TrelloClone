@@ -20,10 +20,10 @@ class ListViewSet(ModelViewSet):
         return ListSerializer
 
     @action(methods=['PATCH'], detail=True)
-    def new_position(self, request, pk=None):
+    def position(self, request, pk=None):
         if request.method == 'PATCH':
             board_id = self.get_object().board_id.id
-            list_new_position = request.data['position']
+            list_new_position = request.data['new_position']
             if list_new_position > List.objects.filter(board_id=board_id).count():
                 return Response(
                     status=status.HTTP_400_BAD_REQUEST,
