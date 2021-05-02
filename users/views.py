@@ -44,7 +44,7 @@ class UsersViewSet(ModelViewSet):
             favoritedetail = request.data['favorite']
             for favorite in favoritedetail:
                 user_detail.favorites.remove(favorite)
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['GET'], detail=True)
     def creator(self, request, pk=None):
